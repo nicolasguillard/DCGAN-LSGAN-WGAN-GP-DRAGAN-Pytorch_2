@@ -1,4 +1,15 @@
 ***News***
+- 14 may 2014: Fork of [GANs - Pytorch](https://github.com/LynnHo/DCGAN-LSGAN-WGAN-GP-DRAGAN-Pytorch)
+    - [**Pytorch version 2**](https://pytorch.org/docs/2.3/)
+    - Adding MPS support for Macos with Silicon
+    - New arguments
+        - device
+        - data_path
+        - output
+    - Add fix of issue of generated image values outside [-1., 1]
+    - CustomImageDataset replace DiskImageDataset
+---
+***Previously***
 
 - 28 June 2019: We re-implement these GANs by **Pytorch 1.1**! The old version is here: [v0](https://github.com/LynnHo/WGAN-GP-DRAGAN-Celeba-Pytorch/tree/v0) or in the "v0" directory.
 - [**Tensorflow 2** Version](https://github.com/LynnHo/DCGAN-LSGAN-WGAN-GP-DRAGAN-Tensorflow-2)

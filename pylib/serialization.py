@@ -1,7 +1,7 @@
 import json
 import os
 import pickle
-
+import oyaml as yaml
 
 def _check_ext(path, default_ext):
     name, ext = os.path.splitext(path)
@@ -33,8 +33,6 @@ def load_json(path, **kwargs):
 
 
 def save_yaml(path, data, **kwargs):
-    import oyaml as yaml
-
     path = _check_ext(path, 'yml')
 
     with open(path, 'w') as f:
@@ -42,7 +40,6 @@ def save_yaml(path, data, **kwargs):
 
 
 def load_yaml(path, **kwargs):
-    import oyaml as yaml
     with open(path) as f:
         return yaml.load(f, **kwargs)
 

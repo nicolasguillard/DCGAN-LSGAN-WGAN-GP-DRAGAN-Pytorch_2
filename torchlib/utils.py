@@ -46,3 +46,19 @@ def save_checkpoint(obj, save_path, is_best=False, max_keep=None):
     # copy best
     if is_best:
         shutil.copyfile(save_path, os.path.join(save_dir, 'best_model.ckpt'))
+
+
+def get_best_device(verbose=False):
+    if torch.cuda.is_available():
+        device = torch.device("cuda")
+        if verbose:
+            print('CUDA GPU available for training. Models moved to CUDA GPU')
+    elif torch.backends.mps.is_available():
+        device = torch.device("mps")
+        if verbose:
+            print('MPS GPU available for training. Models moved to MPS GPU')
+    else:
+        device = torch.device("cpu")
+        if verbose:
+            print('Training on CPU')
+    return device
