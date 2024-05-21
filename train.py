@@ -2,15 +2,15 @@
 import functools
 import os
 
-import imlib as im
 import numpy as np
-import pylib as py
 import tensorboardX
 import torch
 import torchlib
 import torchprob as gan
 import tqdm
 
+import imlib as im
+import pylib as py
 import data
 import module
 
@@ -38,7 +38,15 @@ if __name__ == "__main__":
     py.arg('--device', default='best', choices=['best', 'cpu'] + gpu_list)
     py.arg('--data_path', default='.')
     py.arg('--output', default='./output/')
+    py.arg('-v', '--verbose', action='store_true') # default : False
+    py.arg('--sample_generation', action='store_true') # default : False
+    py.arg('--sample_epoch', action='store_false') # default : True
     args = py.args()
+
+    # display args value
+    if args.verbose:
+        for arg, value in vars(args).items():
+            print(f"{arg:>30} : {value}")
 
     # output_dir
     if args.experiment_name == 'none':
@@ -71,8 +79,8 @@ if __name__ == "__main__":
         n_G_upsamplings = n_D_downsamplings = 3
 
     elif args.dataset == 'celeba':  # 64x64
-        #img_paths = py.glob(os.path.join(args.data_path, 'Udacity_gan/processed_celeba_small/celeba'), '*.jpg')
-        img_path = os.path.join(args.data_path, 'Udacity_gan/processed_celeba_small/celeba')
+        #img_paths = py.glob(os.path.join(args.data_path, 'processed_celeba_small/celeba'), '*.jpg')
+        img_path = os.path.join(args.data_path, 'processed_celeba_small/celeba')
         data_loader, shape = data.make_celeba_dataset(img_path, args.batch_size, pin_memory=use_gpu)
         n_G_upsamplings = n_D_downsamplings = 4
 
@@ -199,9 +207,9 @@ if __name__ == "__main__":
 
     print("Start training\n")
 
-    for ep in tqdm.trange(ep, args.epochs, desc='Epoch Loop'):
+    for ep in range(ep, args.epochs):
         # train for an epoch
-        for x_real in tqdm.tqdm(data_loader, desc=f"Inner Epoch {ep:2d} loop"):
+        for x_real in tqdm.tqdm(data_loader, desc=f"Epoch {ep:3d}/{args.epochs:3d}"):
             x_real = x_real.to(device)
 
             D_loss_dict = train_D(x_real)
@@ -216,13 +224,21 @@ if __name__ == "__main__":
                     writer.add_scalar('G/%s' % k, v.data.cpu().numpy(), global_step=it_g)
 
             # sample
-            if it_g % 100 == 0:
+            if args.sample_generation & it_g % 100 == 0:
                 x_fake = generate_fake(z)
                 x_fake = np.transpose(x_fake.data.cpu().numpy(), (0, 2, 3, 1))
                 img = im.immerge(x_fake, n_rows=10).squeeze()
                 img = np.clip(img, -1., 1.)
                 #print(f"Min: {img.min()} / Max : {img.max()}") ## DEBUG
-                im.imwrite(img, os.path.join(sample_dir, 'iter-%09d.jpg' % it_g))
+                im.imwrite(img, os.path.join(sample_dir, 'iter-g_%09d.jpg' % it_g))
+
+        if args.sample_epoch:
+            x_fake = generate_fake(z)
+            x_fake = np.transpose(x_fake.data.cpu().numpy(), (0, 2, 3, 1))
+            img = im.immerge(x_fake, n_rows=10).squeeze()
+            img = np.clip(img, -1., 1.)
+            #print(f"Min: {img.min()} / Max : {img.max()}") ## DEBUG
+            im.imwrite(img, os.path.join(sample_dir, 'iter-e_%04d.jpg' % ep))
 
         # save checkpoint
         torchlib.save_checkpoint({'ep': ep, 'it_d': it_d, 'it_g': it_g,

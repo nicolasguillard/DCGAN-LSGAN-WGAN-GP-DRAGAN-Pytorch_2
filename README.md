@@ -1,4 +1,10 @@
 ***News***
+- 21 may 2014:
+    - New arguments:
+        - v / --verbose
+        --sample_generation : save sample images by batch step
+        --sample_epoch : save sample images by batch epoch
+    - Display arguments if verbose.
 - 14 may 2014: Fork of [GANs - Pytorch](https://github.com/LynnHo/DCGAN-LSGAN-WGAN-GP-DRAGAN-Pytorch)
     - [**Pytorch version 2**](https://pytorch.org/docs/2.3/)
     - Adding MPS support for Macos with Silicon
